@@ -5,6 +5,7 @@ plugins {
 	kotlin("plugin.jpa") version "2.1.0"
 	id("org.springframework.boot") version "3.4.1"
 	id("io.spring.dependency-management") version "1.1.7"
+    id ("com.google.devtools.ksp") version "2.1.0-1.0.29"
 }
 
 allOpen {
@@ -56,6 +57,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
+    // QueryDSL
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
+    ksp("io.github.openfeign.querydsl:querydsl-ksp-codegen:7.0")
+
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
@@ -65,6 +70,12 @@ dependencies {
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
 }
 
 tasks.withType<Test> {
