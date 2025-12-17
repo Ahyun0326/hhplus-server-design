@@ -63,6 +63,7 @@ dependencies {
 
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
+    implementation("org.redisson:redisson-spring-boot-starter:3.52.0")
 
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
