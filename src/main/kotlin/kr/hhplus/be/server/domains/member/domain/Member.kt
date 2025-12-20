@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import kr.hhplus.be.server.common.BaseEntity
+import kr.hhplus.be.server.common.jpa.BaseEntity
 
 @Entity
 @Table(name = "member", indexes = [

@@ -10,7 +10,7 @@ import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import kr.hhplus.be.server.common.BaseEntity
+import kr.hhplus.be.server.common.jpa.BaseEntity
 import kr.hhplus.be.server.domains.member.domain.Member
 
 @Entity

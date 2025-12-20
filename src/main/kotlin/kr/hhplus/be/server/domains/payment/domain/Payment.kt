@@ -11,7 +11,7 @@ import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import kr.hhplus.be.server.common.BaseEntity
+import kr.hhplus.be.server.common.jpa.BaseEntity
 import kr.hhplus.be.server.domains.reservation.domain.Reservation
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes

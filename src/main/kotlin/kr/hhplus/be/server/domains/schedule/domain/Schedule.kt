@@ -10,8 +10,8 @@ import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import kr.hhplus.be.server.common.BaseEntity
-import kr.hhplus.be.server.domains.concert.domain.Concert
+import kr.hhplus.be.server.common.jpa.BaseEntity
+import kr.hhplus.be.server.domains.concert.domain.model.Concert
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDateTime
@@ -31,7 +31,7 @@ class Schedule(
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
+    val id: Long = 0L
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "concert_id")
