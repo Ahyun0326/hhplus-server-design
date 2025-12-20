@@ -1,0 +1,17 @@
+package kr.hhplus.be.server.common.exception
+
+import org.springframework.http.HttpStatus
+
+enum class ErrorCode(
+    val status: HttpStatus,
+    val code: Int,
+    val message: String
+) {
+    // 공통 에러
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, 1001, "잘못된 요청입니다."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 1002, "서버 내부 오류가 발생했습니다."),
+
+    // 콘서트 도메인 에러
+    CONCERT_NOT_FOUND(HttpStatus.NOT_FOUND, 2001, "요청하신 콘서트 정보를 찾을 수 없습니다."),
+
+}
