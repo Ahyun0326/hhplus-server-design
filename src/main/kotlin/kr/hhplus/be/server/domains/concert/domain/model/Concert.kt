@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.domains.concert.domain
+package kr.hhplus.be.server.domains.concert.domain.model
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.Table
-import kr.hhplus.be.server.common.BaseEntity
+import kr.hhplus.be.server.common.jpa.BaseEntity
 
 @Entity
 @Table(
@@ -20,7 +20,7 @@ class Concert(
 ) : BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
+    val id: Long = 0L
 
     @Column(nullable = false, length = 100)
     var title: String = title

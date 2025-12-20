@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.support.seeder
 
-import kr.hhplus.be.server.domains.concert.domain.Concert
-import kr.hhplus.be.server.domains.concert.infrastructure.ConcertRepository
-import kr.hhplus.be.server.domains.schedule.domain.Schedule
-import kr.hhplus.be.server.domains.schedule.infrastructure.ScheduleRepository
+import kr.hhplus.be.server.domains.concert.domain.model.Concert
+import kr.hhplus.be.server.domains.concert.domain.repository.ConcertRepository
+import kr.hhplus.be.server.domains.schedule.domain.model.Schedule
+import kr.hhplus.be.server.domains.schedule.domain.repository.ScheduleRepository
 import kr.hhplus.be.server.domains.seat.domain.Seat
 import kr.hhplus.be.server.domains.seat.infrastructure.SeatRepository
 import org.springframework.boot.ApplicationArguments
@@ -32,7 +32,8 @@ class TestDataSeeder(
             )
 
             for (j in 1..2) {
-                val concertedAt = LocalDate.now().plusDays(i.toLong()).atTime(17, 30)
+                val concertedAt = LocalDate.now().plusDays(i+j.toLong())
+                    .atTime(18, 30)
 
                 val savedSchedule = scheduleRepository.save(
                     Schedule(
@@ -45,7 +46,7 @@ class TestDataSeeder(
                 for (k in 1..50) {
                     val seat = Seat(
                         schedule = savedSchedule,
-                        number = "S${k}",
+                        number = "S$k",
                         price = 100000
                     )
                     seatsToSave.add(seat)

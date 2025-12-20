@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 import jakarta.persistence.UniqueConstraint
 import kr.hhplus.be.server.common.jpa.BaseEntity
 import kr.hhplus.be.server.domains.reservation.domain.Reservation
-import kr.hhplus.be.server.domains.schedule.domain.Schedule
+import kr.hhplus.be.server.domains.schedule.domain.model.Schedule
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
