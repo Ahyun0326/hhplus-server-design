@@ -68,6 +68,9 @@ dependencies {
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
 
+    // T
+    implementation("io.hypersistence:hypersistence-tsid:2.1.1")
+
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
