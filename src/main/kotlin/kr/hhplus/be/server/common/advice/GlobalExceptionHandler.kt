@@ -5,7 +5,13 @@ package kr.hhplus.be.server.common.advice
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kr.hhplus.be.server.common.exception.ConcertNotFoundException
 import kr.hhplus.be.server.common.exception.ErrorCode
+import kr.hhplus.be.server.common.exception.InsufficientPointException
 import kr.hhplus.be.server.common.exception.NegativePointException
+import kr.hhplus.be.server.common.exception.PaymentAmountMatchException
+import kr.hhplus.be.server.common.exception.PaymentInfoNotFoundException
+import kr.hhplus.be.server.common.exception.ReservationNotFoundException
+import kr.hhplus.be.server.common.exception.ReservationSeatExpiredException
+import kr.hhplus.be.server.common.exception.ReservationSeatNotFoundException
 import kr.hhplus.be.server.common.exception.ScheduleNotFoundException
 import kr.hhplus.be.server.common.exception.SeatNotFoundException
 import kr.hhplus.be.server.common.exception.SeatUnavailableException
@@ -73,6 +79,60 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(NegativePointException::class)
     fun handleNegativePointException(e: NegativePointException): ResponseEntity<ApiErrorResponse> {
         logger.error(e) { "Handle NegativePointException $e" }
+
+        return ResponseEntity
+            .status(e.errorCode.status)
+            .body(ApiErrorResponse.of(e.errorCode.code, e.errorCode.message))
+    }
+
+    @ExceptionHandler(InsufficientPointException::class)
+    fun handleInsufficientPointException(e: InsufficientPointException): ResponseEntity<ApiErrorResponse> {
+        logger.error(e) { "Handle insufficientPointException $e" }
+
+        return ResponseEntity
+            .status(e.errorCode.status)
+            .body(ApiErrorResponse.of(e.errorCode.code, e.errorCode.message))
+    }
+
+    @ExceptionHandler(ReservationNotFoundException::class)
+    fun handleReservationNotFoundException(e: ReservationNotFoundException): ResponseEntity<ApiErrorResponse> {
+        logger.error(e) { "Handle ReservationNotFoundException $e" }
+
+        return ResponseEntity
+            .status(e.errorCode.status)
+            .body(ApiErrorResponse.of(e.errorCode.code, e.errorCode.message))
+    }
+
+    @ExceptionHandler(ReservationSeatNotFoundException::class)
+    fun handleReservationSeatNotFoundException(e: ReservationSeatNotFoundException): ResponseEntity<ApiErrorResponse> {
+        logger.error(e) { "Handle ReservationSeatNotFoundException $e" }
+
+        return ResponseEntity
+            .status(e.errorCode.status)
+            .body(ApiErrorResponse.of(e.errorCode.code, e.errorCode.message))
+    }
+
+    @ExceptionHandler(ReservationSeatExpiredException::class)
+    fun handleReservationSeatExpiredException(e: ReservationSeatExpiredException): ResponseEntity<ApiErrorResponse> {
+        logger.error(e) { "Handle reservationExpiredException $e" }
+
+        return ResponseEntity
+            .status(e.errorCode.status)
+            .body(ApiErrorResponse.of(e.errorCode.code, e.errorCode.message))
+    }
+
+    @ExceptionHandler(PaymentInfoNotFoundException::class)
+    fun handlePaymentInfoNotFoundException(e: PaymentInfoNotFoundException): ResponseEntity<ApiErrorResponse> {
+        logger.error(e) { "Handle PaymentInfoNotFoundException $e" }
+
+        return ResponseEntity
+            .status(e.errorCode.status)
+            .body(ApiErrorResponse.of(e.errorCode.code, e.errorCode.message))
+    }
+
+    @ExceptionHandler(PaymentAmountMatchException::class)
+    fun handlePaymentAmountMatchException(e: PaymentAmountMatchException): ResponseEntity<ApiErrorResponse> {
+        logger.error(e) { "Handle PaymentAmountMatchException $e" }
 
         return ResponseEntity
             .status(e.errorCode.status)

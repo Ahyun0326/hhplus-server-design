@@ -22,6 +22,16 @@ enum class ErrorCode(
     SEAT_UNAVAILABLE(HttpStatus.CONFLICT, 4002, "이용 불가능한 좌석입니다."),
 
     // 포인트 도메인 에러
-    NEGATIVE_POINT(HttpStatus.CONFLICT, 5001, "충전 금액은 0보다 커야 합니다.")
+    NEGATIVE_POINT(HttpStatus.CONFLICT, 5001, "충전 금액은 0보다 커야 합니다."),
+    INSUFFICIENT_POINT(HttpStatus.CONFLICT, 5002, "결제 포인트가 부족합니다."),
+
+    // 예약 도메인 에러
+    RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, 6001, "예약 정보를 찾을 수 없습니다."),
+    RESERVATION_SEAT_NOT_FOUND(HttpStatus.NOT_FOUND, 6002, "예약 ID에 해당하는 좌석을 찾을 수 없습니다."),
+    RESERVATION_SEAT_EXPIRED(HttpStatus.NOT_FOUND, 6003, "배정된 좌석의 예약 유효 시간이 만료되었습니다."),
+
+    // 결제 도메인 에러
+    PAYMENT_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "결제 정보를 찾을 수 없습니다."),
+    PAYMENT_AMOUNT_MATCH_EXCEPTION(HttpStatus.CONFLICT, 7002, "결제 요청 금액이 불일치합니다.")
 
 }
