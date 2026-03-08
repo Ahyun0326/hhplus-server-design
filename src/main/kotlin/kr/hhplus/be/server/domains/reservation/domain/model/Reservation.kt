@@ -3,14 +3,15 @@ package kr.hhplus.be.server.domains.reservation.domain.model
 import io.hypersistence.tsid.TSID
 
 class Reservation(
-//    private var member: Member = member
-            val number: String
+    val number: String,
+    val memberId: Long
 ) {
     var id: Long = 0L
 
     companion object {
         fun create(): Reservation {
             return Reservation(
+                memberId = 1L,
                 number = TSID.fast().toLowerCase()
             )
         }

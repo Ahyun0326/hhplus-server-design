@@ -7,12 +7,13 @@ import org.springframework.stereotype.Component
 class ReservationMapper {
     fun toEntity(reservation: Reservation): ReservationEntity {
         return ReservationEntity(
+            memberId = reservation.memberId,
             number = reservation.number
         )
     }
 
     fun toDomain(entity: ReservationEntity): Reservation {
-        val reservation = Reservation(entity.number)
+        val reservation = Reservation(entity.number, entity.memberId)
         reservation.assignId(entity.id)
         return reservation
     }

@@ -7,4 +7,6 @@ interface SeatRepository {
     fun findSeats(scheduleId: Long, seatIds: List<Long>): List<Seat>
     fun saveAll(seats: List<Seat>)
     fun updateStatusToAvailable(expiredSeatIds: List<Long>)
+    fun findSeatsByReservationId(reservationId: Long): List<Seat>
+    fun updateStatusToReserved(seatIds: List<Long>)
 }

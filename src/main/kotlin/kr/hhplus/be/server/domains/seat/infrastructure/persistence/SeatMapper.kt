@@ -16,3 +16,11 @@ class SeatMapper {
         )
     }
 }
+
+fun SeatEntity.toDomain(): Seat= Seat(
+    id = this.id,
+    scheduleId = this.schedule.id,
+    number = this.number,
+    status = this.status,
+    price = this.price
+)

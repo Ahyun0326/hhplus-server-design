@@ -12,7 +12,7 @@ class Seat(
 
     var reservationId: Long = 0
 
-    fun validateAvailable(): Boolean {
+    fun isAvailable(): Boolean {
         if (status != SeatStatus.AVAILABLE.name) {
             return false
         }

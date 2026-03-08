@@ -26,7 +26,13 @@ interface SpringSeatJpa : JpaRepository<SeatEntity, Long> {
     fun findSeatEntitiesByIdIn(ids: List<Long>): MutableList<SeatEntity>
 
     @Modifying(clearAutomatically = true)
-    @Query("update SeatEntity s set s.status = :status where s.id in :ids")
+    @Query("update SeatEntity s set s.status = :status, s.reservationId = null where s.id in :ids")
     fun updateStatusToAvailable(@Param("ids") expiredSeatIds: List<Long>, @Param("status") status: String)
+
+    fun findAllByReservationId(reservationId: Long): List<SeatEntity>
+
+    @Modifying(clearAutomatically = true)
+    @Query("update SeatEntity s set s.status = :status where s.id in :ids")
+    fun updateStatusToReserved(@Param("ids") ids: List<Long>, @Param("status") status: String)
 
 }

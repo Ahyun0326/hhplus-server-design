@@ -43,7 +43,7 @@ class ReserveSeatService(
 
             // 예약 가능한 좌석인지 확인
             seatValidator.validateAvailableSeats(
-                seats.filter { !it.validateAvailable() }.map { it.id }
+                seats.filter { !it.isAvailable() }.map { it.id }
             )
 
             // 이용 가능하면 좌석 예약 진행

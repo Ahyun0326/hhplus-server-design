@@ -12,7 +12,7 @@ data class SeatsInfo(
                 seats.zip(heldStatuses).map { (seat, isHeldInStatus) ->
                     val finalStatus = when {
                         isHeldInStatus -> SeatStatus.HOLD.name
-                        else -> SeatStatus.AVAILABLE.name
+                        else -> seat.status
                     }
 
                     SeatInfo.of(seat, finalStatus)

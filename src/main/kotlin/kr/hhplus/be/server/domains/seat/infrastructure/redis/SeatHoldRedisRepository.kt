@@ -48,12 +48,10 @@ class SeatHoldRedisRepository(
     }
 
     override fun removeSeats(expiredSeatIds: List<Long>) {
-        redisTemplate.opsForZSet().remove(ZSET_KEY, expiredSeatIds)
+        redisTemplate.opsForZSet().remove(ZSET_KEY, *expiredSeatIds.toTypedArray())
 
         // Redis Key 명시적 삭제
         val keys = expiredSeatIds.map { String.format(KEY_PATTERN, it) }
         redisTemplate.delete(keys)
-
-        redisTemplate.opsForZSet().remove(ZSET_KEY, expiredSeatIds)
     }
 }

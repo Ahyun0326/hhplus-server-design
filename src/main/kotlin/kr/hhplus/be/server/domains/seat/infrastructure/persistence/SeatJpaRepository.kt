@@ -11,11 +11,14 @@ class SeatJpaRepository(
     private val seatMapper: SeatMapper
 ) : SeatRepository {
     override fun findSeatsByScheduleId(scheduleId: Long): List<Seat> {
-        val seatEntities = springSeatJpa.findAllByScheduleId(scheduleId)
+//        val seatEntities = springSeatJpa.findAllByScheduleId(scheduleId)
+//
+//        return seatEntities.map {
+//            seatMapper.toDomain(it)
+//        }
 
-        return seatEntities.map {
-            seatMapper.toDomain(it)
-        }
+        return springSeatJpa.findAllByScheduleId(scheduleId)
+            .map { it.toDomain() }
     }
 
     override fun findSeats(scheduleId: Long, seatIds: List<Long>): List<Seat> {
@@ -43,5 +46,17 @@ class SeatJpaRepository(
 
     override fun updateStatusToAvailable(expiredSeatIds: List<Long>) {
         springSeatJpa.updateStatusToAvailable(expiredSeatIds, SeatStatus.AVAILABLE.name)
+    }
+
+    override fun findSeatsByReservationId(reservationId: Long): List<Seat> {
+        val seatEntities = springSeatJpa.findAllByReservationId(reservationId)
+
+        return seatEntities.map {
+            seatMapper.toDomain(it)
+        }
+    }
+
+    override fun updateStatusToReserved(seatIds: List<Long>) {
+        springSeatJpa.updateStatusToReserved(seatIds, SeatStatus.RESERVED.name)
     }
 }
