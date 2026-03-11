@@ -1,7 +1,7 @@
 package kr.hhplus.be.server.domains.reservation.application.usecase
 
 import kr.hhplus.be.server.common.exception.ScheduleNotFoundException
-import kr.hhplus.be.server.common.lock.distributedLock
+import kr.hhplus.be.server.domains.common.lock.LockManager
 import kr.hhplus.be.server.domains.reservation.application.dto.ReservationRequest
 import kr.hhplus.be.server.domains.reservation.application.dto.ReservationResponse
 import kr.hhplus.be.server.domains.reservation.domain.model.Reservation
@@ -22,6 +22,7 @@ class ReserveSeatService(
     private val reservationRepository: ReservationRepository,
     private val seatHoldRepository: SeatHoldRepository,
     private val seatValidator: SeatValidator,
+    private val lockManager: LockManager
 ) {
     fun invoke(
         reservationRequest: ReservationRequest
@@ -32,7 +33,7 @@ class ReserveSeatService(
         }
 
         // 분산 락 적용
-        return distributedLock("schedule:${reservationRequest.scheduleId}:seat-reservation") {
+        return lockManager.runWithLock("schedule:${reservationRequest.scheduleId}:seat-reservation") {
             // 존재하는 좌석인지 확인
             val seats = seatRepository.findSeats(reservationRequest.scheduleId, reservationRequest.seatIds)
 
@@ -55,7 +56,7 @@ class ReserveSeatService(
             // 좌석 배정 시간 5분으로 설정
             seatHoldRepository.hold(seats)
 
-            return@distributedLock ReservationResponse(reservation.id)
+            return@runWithLock ReservationResponse(reservation.id)
         }
     }
 }

@@ -6,7 +6,7 @@ import kr.hhplus.be.server.common.exception.PaymentInfoNotFoundException
 import kr.hhplus.be.server.common.exception.PointNotFoundException
 import kr.hhplus.be.server.common.exception.ReservationNotFoundException
 import kr.hhplus.be.server.common.exception.ReservationSeatExpiredException
-import kr.hhplus.be.server.common.lock.distributedLock
+import kr.hhplus.be.server.domains.common.lock.LockManager
 import kr.hhplus.be.server.domains.payment.application.dto.PaymentRequest
 import kr.hhplus.be.server.domains.payment.application.dto.PaymentResponse
 import kr.hhplus.be.server.domains.payment.domain.model.Payment
@@ -31,14 +31,15 @@ class ProcessPaymentService(
     private val pointRepository: PointRepository,
     private val pointHistoryRepository: PointHistoryRepository,
     private val paymentRepository: PaymentRepository,
-    private val pointValidator: PointValidator
+    private val pointValidator: PointValidator,
+    private val lockManager: LockManager
 ) {
     fun process(request: PaymentRequest): PaymentResponse {
 
         val memberId = 1L
 
         // 동시성 방지를 위한 분산 락 적용
-        return distributedLock("reservation:${request.reservationId}:payment") {
+        return lockManager.runWithLock("reservation:${request.reservationId}:payment") {
 
             validatePaymentRequest(request)
 
@@ -56,7 +57,7 @@ class ProcessPaymentService(
             confirmReservation(seats)
             processPointUsage(point, request.point, memberId)
 
-            return@distributedLock PaymentResponse.from(
+            return@runWithLock PaymentResponse.from(
                 processPayment(reservation, request.point)
             )
         }

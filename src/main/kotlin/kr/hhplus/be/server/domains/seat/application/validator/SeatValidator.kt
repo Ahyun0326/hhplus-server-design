@@ -9,6 +9,10 @@ class SeatValidator {
     fun validateExistingSeats(existingIds: List<Long>, requestSeatIds: List<Long>) {
         val missingIds = requestSeatIds - existingIds.toSet()
 
+        if (requestSeatIds.isEmpty()) {
+            throw SeatNotFoundException(requestSeatIds)
+        }
+
         if (missingIds.isNotEmpty()) {
             throw SeatNotFoundException(missingIds)
         }

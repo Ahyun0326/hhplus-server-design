@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.common.lock
+package kr.hhplus.be.server.infrastructure.lock
 
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation

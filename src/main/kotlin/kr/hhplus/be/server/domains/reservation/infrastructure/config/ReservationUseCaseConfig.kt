@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.domains.reservation.infrastructure.config
 
+import kr.hhplus.be.server.domains.common.lock.LockManager
 import kr.hhplus.be.server.domains.reservation.application.usecase.ReserveSeatService
 import kr.hhplus.be.server.domains.seat.domain.repository.SeatHoldRepository
 import kr.hhplus.be.server.domains.seat.application.validator.SeatValidator
@@ -18,7 +19,8 @@ class ReservationUseCaseConfig {
         seatRepository: SeatRepository,
         reservationRepository: ReservationRepository,
         seatHoldRepository: SeatHoldRepository,
-        seatValidator: SeatValidator
+        seatValidator: SeatValidator,
+        lockManager: LockManager
     ): ReserveSeatService {
         return ReserveSeatService(
             scheduleRepository,
@@ -26,6 +28,7 @@ class ReservationUseCaseConfig {
             reservationRepository,
             seatHoldRepository,
             seatValidator,
+            lockManager
         )
     }
 }
