@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domains.concert.application
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.collections.shouldHaveSize
@@ -20,10 +21,13 @@ import java.time.LocalDateTime
 
 class ConcertServiceTest : BehaviorSpec({
 
+    isolationMode = IsolationMode.InstancePerLeaf
+
     val concertRepository: ConcertRepository = mockk()
     val scheduleRepository: ScheduleRepository = mockk()
 
     val concertService = ConcertService(concertRepository, scheduleRepository)
+
 
     given("등록된 콘서트가 없을 때") {
         every { concertRepository.findConcerts() } returns emptyList()
