@@ -18,7 +18,7 @@ class FindPendingPaymentInfoService(
 
         // 예약 정보에 해당하는 좌석이 없는 경우
         val seats = seatRepository.findSeatsByReservationId(reservation.id)
-        check(seats.isNotEmpty()) { throw ReservationSeatNotFoundException() }
+        if (seats.isEmpty()) throw ReservationSeatNotFoundException()
 
         val reservationPaymentDetailQueryDto =
             reservationRepository.getWithDetailsById(reservationId) ?: throw PaymentInfoNotFoundException()
