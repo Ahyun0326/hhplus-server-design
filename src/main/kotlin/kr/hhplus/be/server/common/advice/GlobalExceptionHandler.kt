@@ -18,9 +18,13 @@ import kr.hhplus.be.server.common.exception.ScheduleNotFoundException
 import kr.hhplus.be.server.common.exception.SeatNotFoundException
 import kr.hhplus.be.server.common.exception.SeatUnavailableException
 import kr.hhplus.be.server.common.response.ApiErrorResponse
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
 @RestControllerAdvice
@@ -40,6 +44,23 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
                     message = ErrorCode.INTERNAL_SERVER_ERROR.message
                 )
             )
+    }
+
+    override fun handleMethodArgumentNotValid(
+        e: MethodArgumentNotValidException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        logger.error(e) { "Handle methodArgumentNotValidException $e" }
+
+        val errorMap = e.bindingResult.fieldErrors.associate { error ->
+            error.field to (error.defaultMessage ?: "Invalid Argument Value")
+        }
+
+        return ResponseEntity
+            .status(ErrorCode.INVALID_INPUT_VALUE.status)
+            .body(ApiErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE.code, ErrorCode.INVALID_INPUT_VALUE.message, errorMap))
     }
 
     @ExceptionHandler(ConcertNotFoundException::class)
