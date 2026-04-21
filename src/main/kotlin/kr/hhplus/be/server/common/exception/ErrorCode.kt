@@ -45,4 +45,8 @@ enum class ErrorCode(
     PASSWORD_MISMATCH(HttpStatus.CONFLICT, 8003, "비밀번호가 일치하지 않습니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 8004, "유효하지 않은 토큰입니다."),
 
+    // 대기열 도메인 에러
+    QUEUE_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 9001, "대기열 토큰이 존재하지 않습니다."),
+    QUEUE_TOKEN_INVALID(HttpStatus.FORBIDDEN, 9002, "유효하지 않은 대기열 토큰입니다."),
+
 }
