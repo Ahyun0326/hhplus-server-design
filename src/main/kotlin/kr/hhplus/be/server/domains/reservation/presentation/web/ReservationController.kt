@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domains.reservation.application.dto.ReservationRespon
 import kr.hhplus.be.server.domains.reservation.application.facade.ReservationFacade
 import kr.hhplus.be.server.domains.seat.application.dto.SeatsInfo
 import kr.hhplus.be.server.domains.seat.application.facade.SeatFacade
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -26,7 +27,10 @@ class ReservationController(
     }
 
     @PostMapping
-    fun reserveSeat(@RequestBody reservationRequest: ReservationRequest): ApiResponse<ReservationResponse> {
-        return ApiResponse.success(reservationFacade.reserveSeat(reservationRequest))
+    fun reserveSeat(
+        @AuthenticationPrincipal uuid: String,
+        @RequestBody reservationRequest: ReservationRequest
+    ): ApiResponse<ReservationResponse> {
+        return ApiResponse.success(reservationFacade.reserveSeat(uuid, reservationRequest))
     }
 }

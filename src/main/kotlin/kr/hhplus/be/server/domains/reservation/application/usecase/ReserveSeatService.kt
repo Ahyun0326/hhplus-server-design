@@ -25,6 +25,7 @@ class ReserveSeatService(
     private val lockManager: LockManager
 ) {
     fun invoke(
+        memberId: Long,
         reservationRequest: ReservationRequest
     ): ReservationResponse {
         // 공연 회차 정보 조회
@@ -48,7 +49,7 @@ class ReserveSeatService(
             )
 
             // 이용 가능하면 좌석 예약 진행
-            val reservation = reservationRepository.save(Reservation.create())
+            val reservation = reservationRepository.save(Reservation.create(memberId))
 
             seats.forEach { it.reserve(reservation) }
             seatRepository.saveAll(seats)

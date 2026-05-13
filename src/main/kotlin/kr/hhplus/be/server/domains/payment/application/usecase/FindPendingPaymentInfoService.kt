@@ -11,10 +11,11 @@ class FindPendingPaymentInfoService(
     private val reservationRepository: ReservationRepository,
     private val seatRepository: SeatRepository,
 ) {
-    fun invoke(reservationId: Long): PendingPaymentInfoResponse {
+    fun invoke(memberId: Long, reservationId: Long): PendingPaymentInfoResponse {
         // 예약 정보 조회
         val reservation = reservationRepository.findById(reservationId)
             ?: throw ReservationNotFoundException()
+        if (reservation.memberId != memberId) throw ReservationNotFoundException()
 
         // 예약 정보에 해당하는 좌석이 없는 경우
         val seats = seatRepository.findSeatsByReservationId(reservation.id)

@@ -48,10 +48,10 @@ class ActiveQueueRedisRepository(
     }
 
     override fun findActive(uuid: String): String? =
-        redisTemplate.opsForValue().get(String.format(KEY_PATTERN, uuid)).toString()
+        redisTemplate.opsForValue().get(String.format(KEY_PATTERN, uuid)) as? String
 
     override fun getRemainingSeconds(uuid: String): Long {
-        val token = redisTemplate.opsForValue().get(String.format(KEY_PATTERN, uuid)).toString()
+        val token = findActive(uuid) ?: return 0L
         val expirationTime = redisTemplate.opsForZSet().score(ZSET_KEY, token)
             ?: return 0L
 

@@ -34,16 +34,13 @@ class ProcessPaymentService(
     private val pointValidator: PointValidator,
     private val lockManager: LockManager
 ) {
-    fun process(request: PaymentRequest): PaymentResponse {
-
-        val memberId = 1L
-
+    fun process(memberId: Long, request: PaymentRequest): PaymentResponse {
         // 동시성 방지를 위한 분산 락 적용
         return lockManager.runWithLock("reservation:${request.reservationId}:payment") {
 
             validatePaymentRequest(request)
 
-            val reservation = getReservation(request.reservationId)
+            val reservation = getReservation(memberId, request.reservationId)
             val seats = getSeats(reservation)
             val point = getPoint(memberId)
 
@@ -83,9 +80,12 @@ class ProcessPaymentService(
             .ifEmpty { throw ReservationSeatExpiredException() }
     }
 
-    private fun getReservation(reservationId: Long): Reservation {
-        return reservationRepository.findById(reservationId)
+    private fun getReservation(memberId: Long, reservationId: Long): Reservation {
+        val reservation = reservationRepository.findById(reservationId)
             ?: throw ReservationNotFoundException()
+        if (reservation.memberId != memberId) throw ReservationNotFoundException()
+
+        return reservation
     }
 
     private fun validateSufficientBalanceForPayment(

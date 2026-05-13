@@ -25,6 +25,6 @@ class QueueFacade(
 
     fun promoteWaitingTokens() = promoteQueueTokenService.execute()
 
-    fun validateToken(token: String) = validateQueueTokenService.validate(token)
+    fun validateToken(uuid: String, token: String) = validateQueueTokenService.validate(uuid, token)
 
 }
