@@ -35,6 +35,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
     val seatHoldRepository: SeatHoldRepository = mockk()
     val seatValidator: SeatValidator = mockk()
     val lockManager: LockManager = mockk()
+    val memberId = 1L
 
     val reserveSeatService = ReserveSeatService(
         scheduleRepository,
@@ -64,7 +65,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
 
             then("ScheduleNotFoundException이 발생한다") {
                 shouldThrow<ScheduleNotFoundException> {
-                    reserveSeatService.invoke(request)
+                    reserveSeatService.invoke(memberId, request)
                 }
             }
         }
@@ -82,7 +83,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
 
             then("SeatNotFoundException이 발생한다") {
                 shouldThrow<SeatNotFoundException> {
-                    reserveSeatService.invoke(request)
+                    reserveSeatService.invoke(memberId, request)
                 }
             }
         }
@@ -101,7 +102,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
 
             then("SeatNotFoundException이 발생한다") {
                 shouldThrow<SeatNotFoundException> {
-                    reserveSeatService.invoke(request)
+                    reserveSeatService.invoke(memberId, request)
                 }
             }
         }
@@ -125,7 +126,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
         `when`("좌석 예약을 요청하면") {
             then("SeatUnavailableException이 발생한다") {
                 shouldThrow<SeatUnavailableException> {
-                    reserveSeatService.invoke(request)
+                    reserveSeatService.invoke(memberId, request)
                 }
             }
         }
@@ -133,7 +134,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
 
     given("유효한 공연 회차 ID, 좌석 ID 리스트로") {
         val scheduleId = 1L
-        val reservation = Reservation("test", 1L)
+        val reservation = Reservation("test", memberId)
 
         // 케이스별로 다른 seatIds/seats는 각 when 블록에서 정의
         every { scheduleRepository.existsById(scheduleId) } returns true
@@ -152,7 +153,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
 
             every { seatRepository.findSeats(scheduleId, seatIds) } returns seats
 
-            val result = reserveSeatService.invoke(ReservationRequest(scheduleId, seatIds))
+            val result = reserveSeatService.invoke(memberId, ReservationRequest(scheduleId, seatIds))
 
             then("2개 좌석 모두 HOLD로 변경되고 예약된다") {
                 verify(exactly = 1) { reservationRepository.save(any()) }
@@ -172,7 +173,7 @@ class ReserveSeatServiceTest : BehaviorSpec({
 
             every { seatRepository.findSeats(scheduleId, seatIds) } returns seats
 
-            val result = reserveSeatService.invoke(ReservationRequest(scheduleId, seatIds))
+            val result = reserveSeatService.invoke(memberId, ReservationRequest(scheduleId, seatIds))
 
             then("단일 좌석도 정상 예약된다") {
                 verify(exactly = 1) { reservationRepository.save(any()) }

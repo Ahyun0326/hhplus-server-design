@@ -23,6 +23,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
 
     val reservationRepository: ReservationRepository = mockk()
     val seatRepository: SeatRepository = mockk()
+    val memberId = 1L
 
     val findPendingPaymentInfoService = FindPendingPaymentInfoService(reservationRepository, seatRepository)
 
@@ -34,7 +35,22 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
         `when`("결제 정보를 조회하면") {
             then("ReservationNotFoundException이 발생한다") {
                 shouldThrow<ReservationNotFoundException> {
-                    findPendingPaymentInfoService.invoke(reservationId)
+                    findPendingPaymentInfoService.invoke(memberId, reservationId)
+                }
+            }
+        }
+    }
+
+    given("다른 회원의 예약 ID로") {
+        val reservationId = 1L
+        val otherMemberReservation = Reservation("test", 2L).apply { assignId(reservationId) }
+
+        every { reservationRepository.findById(reservationId) } returns otherMemberReservation
+
+        `when`("결제 정보를 조회하면") {
+            then("ReservationNotFoundException이 발생한다") {
+                shouldThrow<ReservationNotFoundException> {
+                    findPendingPaymentInfoService.invoke(memberId, reservationId)
                 }
             }
         }
@@ -42,7 +58,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
 
     given("예약 정보에 해당하는 좌석이 없는 경우") {
         val reservationId = 1L
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
 
         every { reservationRepository.findById(reservationId) } returns reservation
         every { seatRepository.findSeatsByReservationId(reservationId) } returns emptyList()
@@ -50,7 +66,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
         `when`("결제 정보를 조회하면") {
             then("ReservationSeatNotFoundException이 발생한다") {
                 shouldThrow<ReservationSeatNotFoundException> {
-                    findPendingPaymentInfoService.invoke(reservationId)
+                    findPendingPaymentInfoService.invoke(memberId, reservationId)
                 }
             }
         }
@@ -58,7 +74,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
 
     given("예약에 해당하는 결제 정보가 없는 경우") {
         val reservationId = 1L
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
 
         every { reservationRepository.findById(reservationId) } returns reservation
         every { seatRepository.findSeatsByReservationId(any()) } returns listOf(mockk())
@@ -67,7 +83,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
         `when`("결제 정보를 조회하면") {
             then("PaymentInfoNotFoundException이 발생한다") {
                 shouldThrow<PaymentInfoNotFoundException> {
-                    findPendingPaymentInfoService.invoke(reservationId)
+                    findPendingPaymentInfoService.invoke(memberId, reservationId)
                 }
             }
         }
@@ -75,7 +91,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
 
     given("정상적인 예약 ID로") {
         val reservationId = 1L
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
 
         val seats = (1L..2L).map { id ->
             Seat(id, 1L, "A$id", SeatStatus.HOLD.name, 5000)
@@ -96,7 +112,7 @@ class FindPendingPaymentInfoServiceTest : BehaviorSpec({
         every { reservationRepository.getWithDetailsById(reservationId) } returns dto
 
         `when`("결제 정보를 조회하면") {
-            val result = findPendingPaymentInfoService.invoke(reservationId)
+            val result = findPendingPaymentInfoService.invoke(memberId, reservationId)
 
             then("결제 대기 정보가 반환된다") {
                 result.reservationId shouldBe reservationId
