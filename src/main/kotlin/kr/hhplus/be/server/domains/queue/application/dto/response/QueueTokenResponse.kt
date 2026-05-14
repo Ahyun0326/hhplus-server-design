@@ -3,6 +3,7 @@ package kr.hhplus.be.server.domains.queue.application.dto.response
 import kr.hhplus.be.server.domains.queue.domain.model.AdmissionStatus
 
 data class QueueTokenResponse(
+    val scheduleId: Long,
     val token: String? = null,
     val status: String,                // 현재 상태 ("ACTIVE" / "WAITING")
     val rank: Long? = null,            // (대기 중일 때) 대기 순서
@@ -10,16 +11,18 @@ data class QueueTokenResponse(
 ) {
 
     companion object {
-        fun active(token: String, remainingSeconds: Long): QueueTokenResponse {
+        fun active(scheduleId: Long, token: String, remainingSeconds: Long): QueueTokenResponse {
             return QueueTokenResponse(
+                scheduleId = scheduleId,
                 token = token,
                 status = AdmissionStatus.ACTIVE.name,
                 remainingSeconds = remainingSeconds
             )
         }
 
-        fun waiting(rank: Long?): QueueTokenResponse {
+        fun waiting(scheduleId: Long, rank: Long?): QueueTokenResponse {
             return QueueTokenResponse(
+                scheduleId = scheduleId,
                 status = AdmissionStatus.WAITING.name,
                 rank = rank
             )

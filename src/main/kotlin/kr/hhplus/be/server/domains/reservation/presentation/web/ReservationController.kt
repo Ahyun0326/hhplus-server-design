@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.domains.reservation.presentation.web
 
 import kr.hhplus.be.server.common.response.ApiResponse
+import kr.hhplus.be.server.common.exception.QueueTokenInvalidException
 import kr.hhplus.be.server.domains.reservation.application.dto.ReservationRequest
 import kr.hhplus.be.server.domains.reservation.application.dto.ReservationResponse
 import kr.hhplus.be.server.domains.reservation.application.facade.ReservationFacade
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -29,8 +31,13 @@ class ReservationController(
     @PostMapping
     fun reserveSeat(
         @AuthenticationPrincipal uuid: String,
+        @RequestHeader("X-Queue-Schedule-Id") queueScheduleId: Long,
         @RequestBody reservationRequest: ReservationRequest
     ): ApiResponse<ReservationResponse> {
+        if (queueScheduleId != reservationRequest.scheduleId) {
+            throw QueueTokenInvalidException()
+        }
+
         return ApiResponse.success(reservationFacade.reserveSeat(uuid, reservationRequest))
     }
 }

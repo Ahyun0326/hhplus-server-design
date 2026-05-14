@@ -10,16 +10,20 @@ class GetQueueStatusService(
     private val waitingQueueRepository: WaitingQueueRepository
 ) {
 
-    fun getStatus(uuid: String): QueueTokenResponse {
-        activeQueueRepository.findActive(uuid)?.let { token ->
+    fun getStatus(uuid: String, scheduleId: Long): QueueTokenResponse {
+        activeQueueRepository.findActive(scheduleId, uuid)?.let { token ->
             return QueueTokenResponse.active(
+                scheduleId = scheduleId,
                 token = token,
-                remainingSeconds = activeQueueRepository.getRemainingSeconds(uuid)
+                remainingSeconds = activeQueueRepository.getRemainingSeconds(scheduleId, uuid)
             )
         }
 
-        if (waitingQueueRepository.isWaiting(uuid)) {
-            return QueueTokenResponse.waiting(rank = waitingQueueRepository.getRank(uuid))
+        if (waitingQueueRepository.isWaiting(scheduleId, uuid)) {
+            return QueueTokenResponse.waiting(
+                scheduleId = scheduleId,
+                rank = waitingQueueRepository.getRank(scheduleId, uuid)
+            )
         }
 
         throw QueueTokenNotFoundException()

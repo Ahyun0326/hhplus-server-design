@@ -15,39 +15,46 @@ class IssueQueueTokenService(
     /**
      * 대기열 토큰 발급
      */
-    fun issue(uuid: String) : QueueTokenResponse {
+    fun issue(uuid: String, scheduleId: Long): QueueTokenResponse {
 
         // 이미 활성 상태인 유저인지 확인
-        activeQueueRepository.findActive(uuid)?.let { token ->
+        activeQueueRepository.findActive(scheduleId, uuid)?.let { token ->
             return QueueTokenResponse.active(
+                scheduleId = scheduleId,
                 token = token,
-                remainingSeconds = activeQueueRepository.getRemainingSeconds(uuid)
+                remainingSeconds = activeQueueRepository.getRemainingSeconds(scheduleId, uuid)
             )
         }
 
         // 현재 대기열에 등록된 유저인지 확인
-        if (waitingQueueRepository.isWaiting(uuid)) {
-            return QueueTokenResponse.waiting(rank = waitingQueueRepository.getRank(uuid))
+        if (waitingQueueRepository.isWaiting(scheduleId, uuid)) {
+            return QueueTokenResponse.waiting(
+                scheduleId = scheduleId,
+                rank = waitingQueueRepository.getRank(scheduleId, uuid)
+            )
         }
 
-        // 활성 인원 체크: 최대 1000명
-        val activeCount = activeQueueRepository.countActive()
+        val activeCount = activeQueueRepository.countActive(scheduleId)
 
         return when (policy.judge(activeCount)) {
             // 활성 토큰 즉시 발급
             AdmissionStatus.ACTIVE -> {
-                val token = activeQueueRepository.saveActive(uuid)
-                val remainingSeconds = activeQueueRepository.getRemainingSeconds(uuid)
+                val token = activeQueueRepository.saveActive(scheduleId, uuid)
+                val remainingSeconds = activeQueueRepository.getRemainingSeconds(scheduleId, uuid)
 
-                QueueTokenResponse.active(token = token, remainingSeconds = remainingSeconds)
+                QueueTokenResponse.active(
+                    scheduleId = scheduleId,
+                    token = token,
+                    remainingSeconds = remainingSeconds
+                )
             }
 
             // 대기열 추가
             AdmissionStatus.WAITING -> {
-                waitingQueueRepository.add(uuid)
-                val rank = waitingQueueRepository.getRank(uuid)
+                waitingQueueRepository.add(scheduleId, uuid)
+                val rank = waitingQueueRepository.getRank(scheduleId, uuid)
 
-                QueueTokenResponse.waiting(rank = rank)
+                QueueTokenResponse.waiting(scheduleId = scheduleId, rank = rank)
             }
         }
     }

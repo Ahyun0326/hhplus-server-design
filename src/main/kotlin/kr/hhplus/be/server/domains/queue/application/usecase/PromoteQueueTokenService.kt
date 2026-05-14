@@ -11,12 +11,18 @@ class PromoteQueueTokenService(
 ) {
 
     fun execute() {
-        val availableSlots = capacity - activeQueueRepository.countActive()
+        waitingQueueRepository.findScheduleIds().forEach { scheduleId ->
+            promoteWaitingTokens(scheduleId)
+        }
+    }
+
+    private fun promoteWaitingTokens(scheduleId: Long) {
+        val availableSlots = capacity - activeQueueRepository.countActive(scheduleId)
         val promoteCount = minOf(availableSlots, admissionRatePerTick)
 
         if (promoteCount > 0) {
-            waitingQueueRepository.popWaiting(promoteCount)
-                .forEach { activeQueueRepository.saveActive(it) }
+            waitingQueueRepository.popWaiting(scheduleId, promoteCount)
+                .forEach { activeQueueRepository.saveActive(scheduleId, it) }
         }
     }
 

@@ -7,7 +7,8 @@ class ExpireQueueTokenService(
 ) {
 
     fun execute() {
-        activeQueueRepository.removeExpiredActive()
+        activeQueueRepository.findScheduleIds()
+            .forEach { activeQueueRepository.removeExpiredActive(it) }
     }
 
 }

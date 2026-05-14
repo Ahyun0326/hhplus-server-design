@@ -1,4 +1,5 @@
 package kr.hhplus.be.server.domains.queue.application.dto.request
 
-class IssueQueueTokenRequest {
-}
+data class IssueQueueTokenRequest(
+    val scheduleId: Long
+)

@@ -7,10 +7,10 @@ class ValidateQueueTokenService(
     private val activeQueueRepository: ActiveQueueRepository
 ) {
 
-    fun validate(uuid: String, token: String) {
-        val activeToken = activeQueueRepository.findActive(uuid)
+    fun validate(uuid: String, scheduleId: Long, token: String) {
+        val activeToken = activeQueueRepository.findActive(scheduleId, uuid)
 
-        if (activeToken != token || !activeQueueRepository.isValidToken(token)) {
+        if (activeToken != token || !activeQueueRepository.isValidToken(scheduleId, token)) {
             throw QueueTokenInvalidException()
         }
     }

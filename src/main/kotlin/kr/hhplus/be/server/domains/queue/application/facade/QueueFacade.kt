@@ -17,14 +17,17 @@ class QueueFacade(
     private val validateQueueTokenService: ValidateQueueTokenService
 ) {
 
-    fun issueToken(uuid: String): QueueTokenResponse = issueQueueTokenService.issue(uuid)
+    fun issueToken(uuid: String, scheduleId: Long): QueueTokenResponse =
+        issueQueueTokenService.issue(uuid, scheduleId)
 
-    fun getMyStatus(uuid: String): QueueTokenResponse = getQueueStatusService.getStatus(uuid)
+    fun getMyStatus(uuid: String, scheduleId: Long): QueueTokenResponse =
+        getQueueStatusService.getStatus(uuid, scheduleId)
 
     fun expireOverdueTokens() = expireQueueTokenService.execute()
 
     fun promoteWaitingTokens() = promoteQueueTokenService.execute()
 
-    fun validateToken(uuid: String, token: String) = validateQueueTokenService.validate(uuid, token)
+    fun validateToken(uuid: String, scheduleId: Long, token: String) =
+        validateQueueTokenService.validate(uuid, scheduleId, token)
 
 }
