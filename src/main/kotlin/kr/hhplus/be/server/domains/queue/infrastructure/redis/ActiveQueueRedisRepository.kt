@@ -31,7 +31,7 @@ class ActiveQueueRedisRepository(
      */
     override fun saveActive(scheduleId: Long, uuid: String): String {
         val key = activeUuidKey(scheduleId, uuid)
-        val expirationTime = System.currentTimeMillis() + queueProperties.bookingTokenTtlMs
+        val expirationTime = System.currentTimeMillis() + queueProperties.activeTokenTtlMs
 
         // 토큰 생성
         val token = UUID.randomUUID().toString()
@@ -41,7 +41,7 @@ class ActiveQueueRedisRepository(
         redisTemplate.opsForZSet().add(activeKey(scheduleId), token, expirationTime.toDouble())
 
         // uuid -> token 매핑 저장
-        redisTemplate.opsForValue().set(key, token, queueProperties.bookingTokenTtlMs, TimeUnit.MILLISECONDS)
+        redisTemplate.opsForValue().set(key, token, queueProperties.activeTokenTtlMs, TimeUnit.MILLISECONDS)
 
         return token
     }
@@ -55,6 +55,16 @@ class ActiveQueueRedisRepository(
             ?: return 0L
 
         return ((expirationTime - System.currentTimeMillis()) / 1000).toLong()
+    }
+
+    override fun removeActive(scheduleId: Long, uuid: String) {
+        val key = activeKey(scheduleId)
+        val uuidKey = activeUuidKey(scheduleId, uuid)
+        val token = redisTemplate.opsForValue().get(uuidKey) as? String ?: return
+
+        redisTemplate.opsForZSet().remove(key, token)
+        redisTemplate.delete(uuidKey)
+        removeScheduleIdIfEmpty(scheduleId, key)
     }
 
     override fun removeExpiredActive(scheduleId: Long) {

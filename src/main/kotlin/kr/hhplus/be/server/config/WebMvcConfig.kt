@@ -12,10 +12,9 @@ class WebMvcConfig(
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(queueTokenInterceptor)
-            .addPathPatterns(
+            .addPathPatterns(listOf(
                 "/api/v1/seats/**",
-                "/api/v1/reservation/seats/**",
-                "/api/v1/payments/**"
-            )
+                "/api/v1/reservation/seats/**"
+            ))
     }
 }
