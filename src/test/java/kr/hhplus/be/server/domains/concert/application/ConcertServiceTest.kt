@@ -44,13 +44,14 @@ class ConcertServiceTest : BehaviorSpec({
     }
 
     given("콘서트가 5개 등록되어 있을 때") {
+        val now = LocalDateTime.now()
         val concertQueryDtos = (1..5).map { i ->
             ConcertQueryDto(
                 concertId = i.toLong(),
                 title = "concert$i",
                 location = "location$i",
-                startedAt = mockk(),
-                expiredAt = mockk()
+                startedAt = now.minusDays(10),
+                expiredAt = now.plusDays(i.toLong())
             )
         }
 
@@ -69,9 +70,51 @@ class ConcertServiceTest : BehaviorSpec({
                         actual.concertId shouldBe expected.concertId
                         actual.title shouldBe expected.title
                         actual.location shouldBe expected.location
+                        actual.expiredAt shouldBe expected.expiredAt
+                        actual.expired shouldBe false
                     }
 
                 }
+            }
+        }
+    }
+
+    given("만료된 콘서트가 포함되어 있을 때") {
+        val now = LocalDateTime.now()
+        val concertQueryDtos = listOf(
+            ConcertQueryDto(
+                concertId = 1L,
+                title = "expired concert",
+                location = "location1",
+                startedAt = now.minusDays(10),
+                expiredAt = now.minusMinutes(1)
+            ),
+            ConcertQueryDto(
+                concertId = 2L,
+                title = "available concert",
+                location = "location2",
+                startedAt = now.minusDays(10),
+                expiredAt = now.plusMinutes(1)
+            ),
+            ConcertQueryDto(
+                concertId = 3L,
+                title = "tomorrow concert",
+                location = "location3",
+                startedAt = now.minusDays(10),
+                expiredAt = now.plusDays(1)
+            )
+        )
+
+        every { concertRepository.findConcerts() } returns concertQueryDtos
+
+        `when`("전체 콘서트 목록을 조회하면") {
+            val results = concertService.findConcerts()
+
+            then("현재 시각보다 expiredAt이 이전인 콘서트만 만료로 반환된다") {
+                results.concerts shouldHaveSize 3
+                results.concerts[0].expired shouldBe true
+                results.concerts[1].expired shouldBe false
+                results.concerts[2].expired shouldBe false
             }
         }
     }
@@ -151,8 +194,43 @@ class ConcertServiceTest : BehaviorSpec({
                     this.reservationDates.zip(schedules).forAll { (actual, expected) ->
                         actual.scheduleId shouldBe expected.id
                         actual.datetime shouldBe expected.concertedAt
+                        actual.expired shouldBe false
                     }
                 }
+            }
+        }
+    }
+
+    given("만료된 콘서트 일정이 포함되어 있을 때") {
+        val concertId = 1L
+        val concert = mockk<Concert>()
+        every { concert.id } returns concertId
+
+        val now = LocalDateTime.now()
+        val expiredSchedule = mockk<Schedule>()
+        every { expiredSchedule.id } returns 1L
+        every { expiredSchedule.concert } returns concert
+        every { expiredSchedule.concertedAt } returns now.minusDays(1)
+        every { expiredSchedule.viewingTime } returns 2
+
+        val availableSchedule = mockk<Schedule>()
+        every { availableSchedule.id } returns 2L
+        every { availableSchedule.concert } returns concert
+        every { availableSchedule.concertedAt } returns now.plusDays(1)
+        every { availableSchedule.viewingTime } returns 2
+
+        every { concertRepository.findByIdOrNull(concertId) } returns concert
+        every { scheduleRepository.findAvailableConcerts(concertId) } returns listOf(expiredSchedule, availableSchedule)
+
+        `when`("해당 concertId로 일정 목록을 조회하면") {
+            val results = concertService.findAvailableConcerts(concertId)
+
+            then("모든 일정과 만료 여부가 함께 반환된다") {
+                results.reservationDates shouldHaveSize 2
+                results.reservationDates[0].scheduleId shouldBe expiredSchedule.id
+                results.reservationDates[0].expired shouldBe true
+                results.reservationDates[1].scheduleId shouldBe availableSchedule.id
+                results.reservationDates[1].expired shouldBe false
             }
         }
     }

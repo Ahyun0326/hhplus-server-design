@@ -5,13 +5,15 @@ import java.time.LocalDateTime
 
 class ConcertScheduleResponse(
     val scheduleId: Long,
-    val datetime: LocalDateTime
+    val datetime: LocalDateTime,
+    val expired: Boolean
 ) {
     companion object {
         fun from(schedule: Schedule): ConcertScheduleResponse {
             return ConcertScheduleResponse(
                 schedule.id,
-                schedule.concertedAt
+                schedule.concertedAt,
+                schedule.concertedAt.isBefore(LocalDateTime.now())
             )
         }
     }
