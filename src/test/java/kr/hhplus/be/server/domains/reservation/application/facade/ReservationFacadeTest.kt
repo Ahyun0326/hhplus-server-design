@@ -8,7 +8,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.hhplus.be.server.domains.common.auth.AuthenticatedMemberReader
-import kr.hhplus.be.server.domains.common.queue.ActiveQueueTokenReleaser
 import kr.hhplus.be.server.domains.reservation.application.dto.ReservationRequest
 import kr.hhplus.be.server.domains.reservation.application.dto.ReservationResponse
 import kr.hhplus.be.server.domains.reservation.application.usecase.ReserveSeatService
@@ -19,11 +18,9 @@ class ReservationFacadeTest : BehaviorSpec({
 
     val authenticatedMemberReader: AuthenticatedMemberReader = mockk()
     val reserveSeatService: ReserveSeatService = mockk()
-    val activeQueueTokenReleaser: ActiveQueueTokenReleaser = mockk()
     val reservationFacade = ReservationFacade(
         authenticatedMemberReader,
-        reserveSeatService,
-        activeQueueTokenReleaser
+        reserveSeatService
     )
 
     given("예약이 성공했을 때") {
@@ -34,14 +31,13 @@ class ReservationFacadeTest : BehaviorSpec({
 
         every { authenticatedMemberReader.resolveMemberId(uuid) } returns memberId
         every { reserveSeatService.invoke(memberId, request) } returns response
-        every { activeQueueTokenReleaser.release(uuid, request.scheduleId) } returns Unit
 
         `when`("예약 facade를 호출하면") {
             val result = reservationFacade.reserveSeat(uuid, request)
 
-            then("예약 응답을 반환하고 활성 대기열 토큰을 제거한다") {
+            then("예약 응답을 반환한다") {
                 result shouldBe response
-                verify(exactly = 1) { activeQueueTokenReleaser.release(uuid, request.scheduleId) }
+                verify(exactly = 1) { reserveSeatService.invoke(memberId, request) }
             }
         }
     }
@@ -56,11 +52,10 @@ class ReservationFacadeTest : BehaviorSpec({
         every { reserveSeatService.invoke(memberId, request) } throws exception
 
         `when`("예약 facade를 호출하면") {
-            then("활성 대기열 토큰을 제거하지 않는다") {
+            then("예외가 전파된다") {
                 shouldThrow<RuntimeException> {
                     reservationFacade.reserveSeat(uuid, request)
                 }
-                verify(exactly = 0) { activeQueueTokenReleaser.release(any(), any()) }
             }
         }
     }

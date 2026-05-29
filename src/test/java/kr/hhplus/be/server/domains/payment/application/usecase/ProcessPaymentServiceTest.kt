@@ -74,7 +74,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val reservationId = 1L
         val point = 1000
         val payment = mockk<Payment>()
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns payment
 
@@ -91,7 +91,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("유효하지 않은 포인트(0 또는 음수)로") {
         val reservationId = 1L
         val point = 0
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } throws NegativePointException()
@@ -108,7 +108,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("존재하지 않는 예약 ID로") {
         val reservationId = 1L
         val point = 1000
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } just runs
@@ -127,7 +127,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("다른 회원의 예약 ID로") {
         val reservationId = 1L
         val point = 1000
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
         val otherMemberReservation = Reservation("test", 2L).apply { assignId(reservationId) }
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
@@ -148,7 +148,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val point = 1000
         val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
 
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } just runs
@@ -170,7 +170,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, 1000)
 
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } just runs
@@ -196,7 +196,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, paymentAmount)
         val point = Point(1L, memberId, 1000)
 
-        val request = PaymentRequest(reservationId, usagePoint)
+        val request = PaymentRequest(reservationId, usagePoint, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(usagePoint) } just runs
@@ -229,7 +229,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, paymentAmount)
         val point = Point(1L, memberId, memberBalance)
 
-        val request = PaymentRequest(reservationId, usagePoint)
+        val request = PaymentRequest(reservationId, usagePoint, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(usagePoint) } just runs
@@ -276,7 +276,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
 
         val payment = Payment(reservationId, "test", paymentAmount, PaymentStatus.PAID.name, mockk())
 
-        val request = PaymentRequest(reservationId, usagePoint)
+        val request = PaymentRequest(reservationId, usagePoint, scheduleId = 10L)
 
         // 검증 단계
         every { paymentRepository.findByReservationId(any()) } returns null
