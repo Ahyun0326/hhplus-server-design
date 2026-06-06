@@ -10,6 +10,9 @@ enum class ErrorCode(
     // 공통 에러
     BAD_REQUEST(HttpStatus.BAD_REQUEST, 1001, "잘못된 요청입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 1002, "서버 내부 오류가 발생했습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 1003, "인증이 필요합니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, 1004, "접근 권한이 없습니다."),
+    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, 1002, "입력값이 유효하지 않습니다."),
 
     // 콘서트 도메인 에러
     CONCERT_NOT_FOUND(HttpStatus.NOT_FOUND, 2001, "요청하신 콘서트 정보를 찾을 수 없습니다."),
@@ -34,6 +37,16 @@ enum class ErrorCode(
     // 결제 도메인 에러
     PAYMENT_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "결제 정보를 찾을 수 없습니다."),
     PAYMENT_AMOUNT_MATCH_EXCEPTION(HttpStatus.CONFLICT, 7002, "결제 요청 금액이 불일치합니다."),
-    DUPLICATE_PAYMENT(HttpStatus.CONFLICT, 7003, "이미 결제가 완료된 예약입니다.")
+    DUPLICATE_PAYMENT(HttpStatus.CONFLICT, 7003, "이미 결제가 완료된 예약입니다."),
+
+    // 회원 도메인 에러
+    LOGIN_ID_DUPLICATE(HttpStatus.CONFLICT, 8001, "이미 존재하는 로그인 ID입니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, 8002, "회원 정보를 찾을 수 없습니다."),
+    PASSWORD_MISMATCH(HttpStatus.CONFLICT, 8003, "비밀번호가 일치하지 않습니다."),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 8004, "유효하지 않은 토큰입니다."),
+
+    // 대기열 도메인 에러
+    QUEUE_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 9001, "대기열 토큰이 존재하지 않습니다."),
+    QUEUE_TOKEN_INVALID(HttpStatus.FORBIDDEN, 9002, "유효하지 않은 대기열 토큰입니다."),
 
 }

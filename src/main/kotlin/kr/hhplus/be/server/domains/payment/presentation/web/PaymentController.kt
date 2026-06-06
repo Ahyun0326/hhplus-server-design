@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domains.payment.application.dto.PaymentRequest
 import kr.hhplus.be.server.domains.payment.application.dto.PaymentResponse
 import kr.hhplus.be.server.domains.payment.application.dto.PendingPaymentInfoResponse
 import kr.hhplus.be.server.domains.payment.application.facade.PaymentFacade
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,12 +20,18 @@ class PaymentController(
 ) {
 
     @GetMapping("/{reservationId}")
-    fun findPendingPaymentInfo(@PathVariable("reservationId") reservationId: Long): ApiResponse<PendingPaymentInfoResponse> {
-        return ApiResponse.success(paymentFacade.findPendingPaymentInfo(reservationId))
+    fun findPendingPaymentInfo(
+        @AuthenticationPrincipal uuid: String,
+        @PathVariable("reservationId") reservationId: Long
+    ): ApiResponse<PendingPaymentInfoResponse> {
+        return ApiResponse.success(paymentFacade.findPendingPaymentInfo(uuid, reservationId))
     }
 
     @PostMapping
-    fun processPayment(@RequestBody request: PaymentRequest): ApiResponse<PaymentResponse> {
-        return ApiResponse.success(paymentFacade.processPayment(request))
+    fun processPayment(
+        @AuthenticationPrincipal uuid: String,
+        @RequestBody request: PaymentRequest
+    ): ApiResponse<PaymentResponse> {
+        return ApiResponse.success(paymentFacade.processPayment(uuid, request))
     }
 }

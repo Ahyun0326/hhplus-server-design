@@ -48,6 +48,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     val paymentRepository: PaymentRepository = mockk()
     val pointValidator: PointValidator = mockk()
     val lockManager: LockManager = mockk()
+    val memberId = 1L
 
     val processPaymentService = ProcessPaymentService(
         reservationRepository,
@@ -73,14 +74,14 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val reservationId = 1L
         val point = 1000
         val payment = mockk<Payment>()
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns payment
 
         `when`("결제 요청이 들어오면") {
             then("DuplicatePaymentException이 발생한다") {
                 shouldThrow<DuplicatePaymentException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
             }
         }
@@ -90,7 +91,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("유효하지 않은 포인트(0 또는 음수)로") {
         val reservationId = 1L
         val point = 0
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } throws NegativePointException()
@@ -98,7 +99,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         `when`("결제 요청이 들어오면") {
             then("NegativePointException이 발생한다") {
                 shouldThrow<NegativePointException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
             }
         }
@@ -107,7 +108,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("존재하지 않는 예약 ID로") {
         val reservationId = 1L
         val point = 1000
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } just runs
@@ -116,9 +117,28 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         `when`("결제 요청이 들어오면") {
             then("ReservationNotFoundException 발생한다") {
                 shouldThrow<ReservationNotFoundException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
 
+            }
+        }
+    }
+
+    given("다른 회원의 예약 ID로") {
+        val reservationId = 1L
+        val point = 1000
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
+        val otherMemberReservation = Reservation("test", 2L).apply { assignId(reservationId) }
+
+        every { paymentRepository.findByReservationId(reservationId) } returns null
+        every { pointValidator.validateNegativePoint(point) } just runs
+        every { reservationRepository.findById(reservationId) } returns otherMemberReservation
+
+        `when`("결제 요청이 들어오면") {
+            then("ReservationNotFoundException 발생한다") {
+                shouldThrow<ReservationNotFoundException> {
+                    processPaymentService.process(memberId, request)
+                }
             }
         }
     }
@@ -126,9 +146,9 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("예약 정보로 조회한 좌석 목록이 비어 있을 때 (유효 시간 만료)") {
         val reservationId = 1L
         val point = 1000
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
 
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } just runs
@@ -138,7 +158,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         `when`("결제 요청이 들어오면") {
             then("ReservationSeatExpiredException이 발생한다") {
                 shouldThrow<ReservationSeatExpiredException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
             }
         }
@@ -147,10 +167,10 @@ class ProcessPaymentServiceTest : BehaviorSpec({
     given("회원의 포인트가 존재하지 않을 때") {
         val reservationId = 1L
         val point = 1000
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, 1000)
 
-        val request = PaymentRequest(reservationId, point)
+        val request = PaymentRequest(reservationId, point, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(point) } just runs
@@ -161,7 +181,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         `when`("결제 요청이 들어오면") {
             then("PointNotFoundException이 발생한다") {
                 shouldThrow<PointNotFoundException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
             }
         }
@@ -172,11 +192,11 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val usagePoint = 1000
         val paymentAmount = 1100
 
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, paymentAmount)
-        val point = Point(1L, 1L, 1000)
+        val point = Point(1L, memberId, 1000)
 
-        val request = PaymentRequest(reservationId, usagePoint)
+        val request = PaymentRequest(reservationId, usagePoint, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(usagePoint) } just runs
@@ -193,7 +213,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         `when`("결제 요청이 들어오면") {
             then("PaymentAmountMatchException이 발생한다") {
                 shouldThrow<PaymentAmountMatchException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
             }
         }
@@ -205,11 +225,11 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val paymentAmount = 1000
         val memberBalance = 900
 
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, paymentAmount)
-        val point = Point(1L, 1L, memberBalance)
+        val point = Point(1L, memberId, memberBalance)
 
-        val request = PaymentRequest(reservationId, usagePoint)
+        val request = PaymentRequest(reservationId, usagePoint, scheduleId = 10L)
 
         every { paymentRepository.findByReservationId(reservationId) } returns null
         every { pointValidator.validateNegativePoint(usagePoint) } just runs
@@ -227,7 +247,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         `when`("결제 요청이 들어오면") {
             then("InsufficientPointException이 발생한다") {
                 shouldThrow<InsufficientPointException> {
-                    processPaymentService.process(request)
+                    processPaymentService.process(memberId, request)
                 }
             }
         }
@@ -240,9 +260,9 @@ class ProcessPaymentServiceTest : BehaviorSpec({
         val memberBalance = 1000
         val concertedAt = LocalDateTime.of(2026, 1, 1, 1, 1)
 
-        val reservation = Reservation("test", 1L).apply { assignId(reservationId) }
+        val reservation = Reservation("test", memberId).apply { assignId(reservationId) }
         val seats = Seat(1L, 1L, "A1", SeatStatus.AVAILABLE.name, paymentAmount)
-        val point = Point(1L, 1L, memberBalance)
+        val point = Point(1L, memberId, memberBalance)
 
         val reservationPaymentDetailQueryDto = ReservationPaymentDetailQueryDto(
             reservationId = reservationId,
@@ -256,7 +276,7 @@ class ProcessPaymentServiceTest : BehaviorSpec({
 
         val payment = Payment(reservationId, "test", paymentAmount, PaymentStatus.PAID.name, mockk())
 
-        val request = PaymentRequest(reservationId, usagePoint)
+        val request = PaymentRequest(reservationId, usagePoint, scheduleId = 10L)
 
         // 검증 단계
         every { paymentRepository.findByReservationId(any()) } returns null
@@ -279,14 +299,14 @@ class ProcessPaymentServiceTest : BehaviorSpec({
 
         `when`("결제 요청이 들어오면") {
             then("포인트가 차감되고 결제 내역이 저장된다") {
-                processPaymentService.process(request)
+                processPaymentService.process(memberId, request)
 
                 verify(exactly = 1) { pointRepository.save(point) }
                 verify(exactly = 1) { paymentRepository.save(any(), any()) }
             }
 
             then("결제 응답이 정상적으로 반환된다.") {
-                val result = processPaymentService.process(request)
+                val result = processPaymentService.process(memberId, request)
 
                 result.shouldNotBeNull {
                     this.paymentId shouldBe payment.id

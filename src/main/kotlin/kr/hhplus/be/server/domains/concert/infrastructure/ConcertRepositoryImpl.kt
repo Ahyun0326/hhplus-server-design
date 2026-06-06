@@ -26,8 +26,8 @@ class ConcertRepositoryImpl(
                     concert.id,
                     concert.title,
                     concert.location,
-                    schedule.concertedAt.min().toLocalDate(),
-                    schedule.concertedAt.max().toLocalDate(),
+                    schedule.concertedAt.min(),
+                    schedule.concertedAt.max()
                 )
             )
             .from(concert)
@@ -61,5 +61,4 @@ class ConcertRepositoryImpl(
             this
         )
     }
-
 }

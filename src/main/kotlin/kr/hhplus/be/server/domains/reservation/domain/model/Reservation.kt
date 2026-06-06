@@ -9,9 +9,9 @@ class Reservation(
     var id: Long = 0L
 
     companion object {
-        fun create(): Reservation {
+        fun create(memberId: Long): Reservation {
             return Reservation(
-                memberId = 1L,
+                memberId = memberId,
                 number = TSID.fast().toLowerCase()
             )
         }

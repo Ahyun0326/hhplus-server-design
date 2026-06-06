@@ -1,16 +1,15 @@
 package kr.hhplus.be.server.domains.concert.application.dto.response
 
 import kr.hhplus.be.server.domains.concert.domain.repository.projection.ConcertQueryDto
-import kr.hhplus.be.server.domains.schedule.domain.model.Schedule
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ConcertResponse(
     val concertId: Long,
     val title: String,
     val location: String,
-    val startedAt: LocalDate,
-    val expiredAt: LocalDate
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val expired: Boolean
 ) {
     companion object {
         fun from(concertQueryDto: ConcertQueryDto): ConcertResponse {
@@ -20,6 +19,7 @@ data class ConcertResponse(
                 concertQueryDto.location,
                 concertQueryDto.startedAt,
                 concertQueryDto.expiredAt,
+                concertQueryDto.expiredAt.isBefore(LocalDateTime.now())
             )
         }
     }

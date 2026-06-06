@@ -56,6 +56,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // QueryDSL
     implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
@@ -68,10 +69,16 @@ dependencies {
     // Redis 기본 라이브러리
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
+    // JWT & Spring Security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
+
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.13")
 
-    // T
+    // Tsid
     implementation("io.hypersistence:hypersistence-tsid:2.1.1")
 
     // Test
