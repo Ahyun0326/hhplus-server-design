@@ -39,8 +39,8 @@ out/
 
 data
 
-# Claude code
+# Agent
 CLAUDE.md
-skills.md
-HANDOFF.md
-TESTING-GUIDE.md
+AGENTS.md
+docs/agent/
+ROADMAP.md
