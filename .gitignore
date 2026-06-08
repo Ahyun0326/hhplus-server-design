@@ -43,6 +43,7 @@ data
 **/.terraform/
 **/terraform.tfstate
 **/terraform.tfstate.*
+**/.terraform.tfstate.lock.info
 **/*.tfvars
 !**/*.tfvars.example
 
