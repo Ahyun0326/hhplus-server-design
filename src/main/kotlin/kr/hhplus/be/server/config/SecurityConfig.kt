@@ -36,6 +36,7 @@ class SecurityConfig(
                     .accessDeniedHandler(accessDeniedHandler)
             }
             .authorizeHttpRequests {
+                it.requestMatchers("/health").permitAll()
                 it.requestMatchers("/api/v1/auth/**").permitAll()
                 it.anyRequest().authenticated()
             }

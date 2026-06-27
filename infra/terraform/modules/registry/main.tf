@@ -10,7 +10,7 @@ resource "aws_ecr_repository" "api" {
     encryption_type = "AES256"
   }
 
-  tags = merge(local.common_tags, {
+  tags = merge(var.common_tags, {
     Name = var.ecr_repository_name
   })
 }

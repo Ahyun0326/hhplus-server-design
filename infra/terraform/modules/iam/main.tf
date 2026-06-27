@@ -1,8 +1,6 @@
-# IAM Task Execution Role
-
 # ECS task가 assume 할 수 있는 role 생성
 resource "aws_iam_role" "ecs_task_execution" {
-  name = "${local.name_prefix}-ecs-task-execution-role"
+  name = "${var.name_prefix}-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -17,8 +15,8 @@ resource "aws_iam_role" "ecs_task_execution" {
     ]
   })
 
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-ecs-task-execution-role"
+  tags = merge(var.common_tags, {
+    Name = "${var.name_prefix}-ecs-task-execution-role"
   })
 }
 
