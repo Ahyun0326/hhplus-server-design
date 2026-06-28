@@ -53,7 +53,7 @@ resource "aws_ecs_service" "api" {
   desired_count                     = var.api_desired_count
   launch_type                       = "FARGATE"
   enable_execute_command            = false
-  health_check_grace_period_seconds = 60
+  health_check_grace_period_seconds = 180
 
   network_configuration {
     subnets          = var.private_subnet_ids
