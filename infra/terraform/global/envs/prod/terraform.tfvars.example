@@ -3,6 +3,7 @@ aws_profile  = "ys-admin"
 project_name = "concerts"
 environment  = "global"
 domain_name  = "stagepick.cloud"
+ecr_repository_name = "concerts-api"
 
 vercel_cname_value          = "replace-me"
 enable_frontend_apex_record = true

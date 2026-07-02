@@ -1,3 +1,10 @@
+module "registry" {
+  source = "../modules/registry"
+
+  ecr_repository_name = var.ecr_repository_name
+  common_tags         = local.common_tags
+}
+
 module "domain" {
   source = "../modules/domain"
 
