@@ -1,3 +1,13 @@
+output "ecr_repository_name" {
+  description = "ECR repository name."
+  value       = module.registry.repository_name
+}
+
+output "ecr_repository_url" {
+  description = "ECR repository URL."
+  value       = module.registry.repository_url
+}
+
 output "route53_name_servers" {
   description = "Route 53 name servers to register at Gabia."
   value       = module.domain.name_servers

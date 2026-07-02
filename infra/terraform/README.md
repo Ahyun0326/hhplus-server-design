@@ -2,7 +2,7 @@
 
 이 디렉터리는 `prod` 환경을 위한 Terraform root module이다.
 
-Route 53 Hosted Zone, ACM certificate, Vercel frontend DNS record처럼 계속 유지해야 하는 리소스는 `infra/terraform/global`에서 관리한다.
+Route 53 Hosted Zone, ACM certificate, Vercel frontend DNS record, ECR repository처럼 계속 유지해야 하는 리소스는 `infra/terraform/global`에서 관리한다.
 
 ## 구조
 
@@ -12,7 +12,7 @@ infra/terraform/
   variables.tf             # 공통 입력값
   outputs.tf               # 주요 출력값
   envs/prod/               # prod 환경 변수 예시
-  global/                  # Route 53, ACM, frontend DNS 같은 유지 리소스
+  global/                  # Route 53, ACM, frontend DNS, ECR 같은 유지 리소스
   modules/                 # 용도별 로컬 모듈
 ```
 
@@ -21,7 +21,7 @@ infra/terraform/
 - `network`: VPC, subnet, route table, internet gateway
 - `security`: ALB/ECS/VPC Endpoint 보안그룹
 - `vpc-endpoints`: ECR, CloudWatch Logs, S3 endpoint
-- `registry`: ECR repository
+- `registry`: ECR repository. `global` root에서 사용한다.
 - `observability`: CloudWatch log group
 - `iam`: ECS task execution role
 - `ecs-cluster`: ECS Fargate cluster
@@ -45,6 +45,7 @@ terraform -chdir=infra/terraform apply -var-file=envs/prod/terraform.tfvars.exam
 - Hosted Zone: `stagepick.cloud` (`global` root에서 관리)
 - API Alias: `api.stagepick.cloud`
 - ACM Certificate: `stagepick.cloud`, `*.stagepick.cloud` (`global` root에서 관리)
+- ECR Repository: `concerts-api` (`global` root에서 관리)
 - HTTP 80 요청은 ALB에서 HTTPS 443으로 리다이렉트한다.
 
 ## 유용한 Output
@@ -59,6 +60,7 @@ global root output:
 terraform -chdir=infra/terraform/global output route53_name_servers
 terraform -chdir=infra/terraform/global output route53_hosted_zone_id
 terraform -chdir=infra/terraform/global output acm_certificate_arn
+terraform -chdir=infra/terraform/global output ecr_repository_url
 ```
 
 ## 운영 가이드

@@ -22,12 +22,6 @@ variable "environment" {
   default     = "prod"
 }
 
-variable "ecr_repository_name" {
-  description = "ECR repository name for the backend API image."
-  type        = string
-  default     = "concerts-api"
-}
-
 variable "vpc_cidr" {
   description = "CIDR block for the VPC."
   type        = string
@@ -78,6 +72,11 @@ variable "initial_image_tag" {
   description = "Initial image tag used only for bootstrapping ECS task definitions."
   type        = string
   default     = "latest"
+}
+
+variable "ecr_repository_url" {
+  description = "ECR repository URL managed by the global Terraform root."
+  type        = string
 }
 
 variable "task_cpu" {

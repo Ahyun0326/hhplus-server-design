@@ -28,6 +28,12 @@ variable "domain_name" {
   default     = "stagepick.cloud"
 }
 
+variable "ecr_repository_name" {
+  description = "ECR repository name for the backend API image."
+  type        = string
+  default     = "concerts-api"
+}
+
 variable "vercel_cname_value" {
   description = "Vercel CNAME target for www frontend domain."
   type        = string
